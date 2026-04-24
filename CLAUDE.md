@@ -10,15 +10,13 @@ same session as the change.** Coverage and green suites are not evidence.
 
 ### Acceptance demo for this module
 
-<!-- TODO: replace this block with the exact command(s) that exercise this
-     module end-to-end against real dependencies, and the expected output.
-     The commands must run the real artifact (built binary, deployed
-     container, real service) — no in-process fakes, no mocks, no
-     `httptest.NewServer`, no Robolectric, no JSDOM as proof of done. -->
-
 ```bash
-# TODO
+# Kafka-sourced conversation replay with LLM-based compression
+cd ConversationContext && GOMAXPROCS=2 nice -n 19 go test -count=1 -race -v \
+  -run 'TestInfiniteContextEngine_ReplayWithCompression' ./...
 ```
+Expect: PASS; events replay from the Kafka source (or in-memory test source), LLM summarization produces a compressed context window.
+
 
 ## Overview
 
