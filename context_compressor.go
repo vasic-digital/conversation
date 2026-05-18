@@ -7,12 +7,28 @@ import (
 	"time"
 
 	"github.com/sirupsen/logrus"
+
+	"digital.vasic.conversation/pkg/i18n"
 )
 
 // ContextCompressor compresses conversation context using LLM-based summarization
 type ContextCompressor struct {
-	llmClient LLMClient
-	logger    *logrus.Logger
+	llmClient  LLMClient
+	logger     *logrus.Logger
+	translator i18n.Translator
+}
+
+// SetTranslator wires a consumer-supplied i18n.Translator. Production
+// callers SHOULD inject a locale-aware translator; the default is
+// i18n.NoopTranslator which returns message IDs verbatim and keeps
+// the package CONST-051(B) decoupled from any consumer-project locale
+// resolution (CONST-046 Phase 4 round 128).
+func (cc *ContextCompressor) SetTranslator(t i18n.Translator) {
+	if t == nil {
+		cc.translator = i18n.NoopTranslator{}
+		return
+	}
+	cc.translator = t
 }
 
 // LLMClient interface for LLM providers
@@ -66,8 +82,9 @@ func NewContextCompressor(llmClient LLMClient, logger *logrus.Logger) *ContextCo
 	}
 
 	return &ContextCompressor{
-		llmClient: llmClient,
-		logger:    logger,
+		llmClient:  llmClient,
+		logger:     logger,
+		translator: i18n.NoopTranslator{},
 	}
 }
 
@@ -106,11 +123,15 @@ func (cc *ContextCompressor) Compress(
 	case CompressionStrategyHybrid:
 		compressed, err = cc.compressHybrid(ctx, messages, entities, maxTokens, config)
 	default:
-		return nil, nil, fmt.Errorf("unknown compression strategy: %s", config.Strategy)
+		return nil, nil, fmt.Errorf("%s: %s",
+			cc.translator.T(ctx, "conversation_compress_unknown_strategy", map[string]any{"strategy": string(config.Strategy)}),
+			config.Strategy)
 	}
 
 	if err != nil {
-		return nil, nil, fmt.Errorf("compression failed: %w", err)
+		return nil, nil, fmt.Errorf("%s: %w",
+			cc.translator.T(ctx, "conversation_compress_failed", nil),
+			err)
 	}
 
 	// Calculate compressed token count
@@ -355,7 +376,9 @@ Summary (2-3 sentences):`, entityContext, conversation.String())
 
 	summary, tokens, err := cc.llmClient.Complete(ctx, prompt, 200)
 	if err != nil {
-		return "", 0, fmt.Errorf("LLM summarization failed: %w", err)
+		return "", 0, fmt.Errorf("%s: %w",
+			cc.translator.T(ctx, "conversation_summarize_llm_failed", nil),
+			err)
 	}
 
 	return summary, tokens, nil
@@ -397,7 +420,9 @@ Summary (5-10 sentences covering main points, decisions, and context):`,
 
 	summary, tokens, err := cc.llmClient.Complete(ctx, prompt, 500)
 	if err != nil {
-		return "", 0, fmt.Errorf("LLM summarization failed: %w", err)
+		return "", 0, fmt.Errorf("%s: %w",
+			cc.translator.T(ctx, "conversation_summarize_llm_failed", nil),
+			err)
 	}
 
 	return summary, tokens, nil

@@ -8,6 +8,7 @@ import (
 	"sync"
 	"time"
 
+	"digital.vasic.conversation/pkg/i18n"
 	"digital.vasic.messaging/pkg/broker"
 	"github.com/google/uuid"
 	"github.com/segmentio/kafka-go"
@@ -20,7 +21,21 @@ type InfiniteContextEngine struct {
 	compressor    *ContextCompressor
 	cache         *ContextCache
 	logger        *logrus.Logger
+	translator    i18n.Translator
 	mu            sync.RWMutex
+}
+
+// SetTranslator wires a consumer-supplied i18n.Translator. The default
+// is i18n.NoopTranslator (returns IDs verbatim) — CONST-046 Phase 4
+// round 128 kickoff.
+func (ice *InfiniteContextEngine) SetTranslator(t i18n.Translator) {
+	ice.mu.Lock()
+	defer ice.mu.Unlock()
+	if t == nil {
+		ice.translator = i18n.NoopTranslator{}
+		return
+	}
+	ice.translator = t
 }
 
 // ContextCache provides LRU caching for replayed conversations
@@ -59,7 +74,8 @@ func NewInfiniteContextEngine(
 			maxSize: 100,
 			ttl:     30 * time.Minute,
 		},
-		logger: logger,
+		logger:     logger,
+		translator: i18n.NoopTranslator{},
 	}
 }
 
@@ -80,7 +96,9 @@ func (ice *InfiniteContextEngine) ReplayConversation(ctx context.Context, conver
 	// Replay from Kafka event stream
 	events, err := ice.fetchConversationEvents(ctx, conversationID)
 	if err != nil {
-		return nil, fmt.Errorf("failed to fetch conversation events: %w", err)
+		return nil, fmt.Errorf("%s: %w",
+			ice.translator.T(ctx, "conversation_replay_fetch_failed", nil),
+			err)
 	}
 
 	if len(events) == 0 {
@@ -169,7 +187,8 @@ func (ice *InfiniteContextEngine) GetConversationSnapshot(ctx context.Context, c
 
 	cached := ice.cache.Get(conversationID)
 	if cached == nil {
-		return nil, fmt.Errorf("conversation not in cache after replay")
+		return nil, fmt.Errorf("%s",
+			ice.translator.T(ctx, "conversation_replay_cache_miss_after_replay", nil))
 	}
 
 	snapshot := &ConversationSnapshot{

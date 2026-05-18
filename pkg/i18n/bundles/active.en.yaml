@@ -1,0 +1,24 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 Milos Vasic
+#
+# Conversation active English bundle.
+# Message IDs are prefixed `conversation_` for namespace clarity when
+# bundled alongside other vasic-digital library surfaces.
+#
+# CONST-046 (no-hardcoded-content) lineage:
+# - Round 128 (2026-05-18) migrated the first batch of user-facing
+#   error literals embedded in context_compressor.go +
+#   infinite_context.go per the i18n kickoff pattern shared across the
+#   HelixCode Phase 4 sweep (DocProcessor / VectorDB / MCP_Module /
+#   Messaging / Lazy / Storage / VisionEngine / LLMOrch /
+#   HelixSpecifier / Middleware / Plugins / Streaming / Watcher
+#   siblings).
+#
+# Placeholders use `{{.name}}` style; consuming Translator
+# implementations may pick any template engine compatible with that
+# arg map.
+conversation_compress_unknown_strategy: "Unknown compression strategy: {{.strategy}}."
+conversation_compress_failed: "Conversation compression failed."
+conversation_summarize_llm_failed: "LLM summarisation failed for the conversation segment."
+conversation_replay_fetch_failed: "Failed to fetch conversation events for replay."
+conversation_replay_cache_miss_after_replay: "Conversation not present in cache after replay completed."
