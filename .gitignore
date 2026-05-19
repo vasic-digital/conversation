@@ -37,4 +37,29 @@ api_keys.sh
 # Logs
 *.log
 coverage.out
+coverage.html
 htmlcov/
+
+# OS/IDE personal state (round-271 CONST-053 enrichment)
+.history/
+*.orig
+*.rej
+.idea/workspace.xml
+.idea/tasks.xml
+
+# Build derivatives (round-271 CONST-053 enrichment — any object/native
+# binary recreatable from `go build`/`go test`)
+*.a
+*.o
+*.class
+*.pyc
+__pycache__/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+node_modules/
+.next/
+
+# Runner test artefacts
+/challenges/runner/runner
+/tmp_runner_output

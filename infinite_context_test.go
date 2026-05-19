@@ -715,7 +715,11 @@ func TestInfiniteContextEngine_GetConversationSnapshot_NotInCacheAfterReplay(t *
 
 	snapshot, err := engine.GetConversationSnapshot(ctx, "conv-not-cached")
 	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "conversation not in cache after replay")
+	// Round-271 (CONST-046 follow-up): the engine surfaces an i18n key
+	// `conversation_replay_cache_miss_after_replay` rather than the legacy
+	// English string. NoopTranslator returns the key verbatim so it appears
+	// in the error.
+	assert.Contains(t, err.Error(), "conversation_replay_cache_miss_after_replay")
 	assert.Nil(t, snapshot)
 }
 

@@ -1,0 +1,50 @@
+{
+  "_comment": "Round-271 bilingual fixture for digital.vasic.conversation. Five locales — en, sr (Cyrillic), ja (Japanese), ar (Arabic, RTL), zh-CN (Han). Each entry carries message-content text the runner serialises into ConversationEvent payloads, round-trips through ToJSON/FromJSON, then reconstructs into MessageData via the InfiniteContextEngine's reconstructFromEvents path (exercised indirectly via ContextCache + ContextCompressor public surfaces). Token-count assertions (countTokens approximates rune/4) survive non-ASCII payload bytes without mutation across the full pipeline — proves the package handles real end-user payloads in every locale rather than ASCII-only fixtures the previous CONST-035 sweeps caught.",
+  "inputs": [
+    {
+      "locale": "en",
+      "user_message": "Summarise the architecture of an event-sourced conversation cache that supports unlimited context.",
+      "assistant_message": "An event-sourced cache replays append-only ConversationEvents from Kafka and reconstructs MessageData snapshots on demand; eviction is LRU with TTL.",
+      "entity_name": "Kafka",
+      "entity_type": "technology",
+      "summary_marker": "ARCH",
+      "expected_min_runes": 30
+    },
+    {
+      "locale": "sr",
+      "user_message": "Опиши архитектуру кеша разговора заснованог на догађајима који подржава неограничен контекст.",
+      "assistant_message": "Кеш заснован на догађајима понавља ConversationEvent догађаје из Kafka теме и реконструише MessageData снимке по захтеву; евикција је LRU са TTL.",
+      "entity_name": "Београд",
+      "entity_type": "location",
+      "summary_marker": "АРХ",
+      "expected_min_runes": 30
+    },
+    {
+      "locale": "ja",
+      "user_message": "無制限のコンテキストをサポートするイベントソース型会話キャッシュのアーキテクチャを要約してください。",
+      "assistant_message": "イベントソース型キャッシュはKafkaから追加専用のConversationEventを再生し、必要に応じてMessageDataスナップショットを再構築します。退避はTTL付きLRUです。",
+      "entity_name": "東京",
+      "entity_type": "location",
+      "summary_marker": "要約",
+      "expected_min_runes": 15
+    },
+    {
+      "locale": "ar",
+      "user_message": "لخص بنية ذاكرة محادثة قائمة على الأحداث تدعم السياق غير المحدود.",
+      "assistant_message": "تعيد ذاكرة الأحداث تشغيل أحداث ConversationEvent من Kafka وتعيد بناء لقطات MessageData عند الطلب؛ الإخلاء بنظام LRU مع TTL.",
+      "entity_name": "دبي",
+      "entity_type": "location",
+      "summary_marker": "ملخص",
+      "expected_min_runes": 25
+    },
+    {
+      "locale": "zh-CN",
+      "user_message": "请总结一个支持无限上下文的事件溯源型对话缓存的架构。",
+      "assistant_message": "事件溯源型缓存从 Kafka 重放仅追加的 ConversationEvent，并按需重建 MessageData 快照；驱逐采用带 TTL 的 LRU。",
+      "entity_name": "上海",
+      "entity_type": "location",
+      "summary_marker": "总结",
+      "expected_min_runes": 10
+    }
+  ]
+}

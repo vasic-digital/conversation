@@ -453,7 +453,11 @@ func TestContextCompressor_SummarizeWindow_LLMError(t *testing.T) {
 
 	summary, tokens, err := cc.summarizeWindow(context.Background(), window, nil)
 	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "LLM summarization failed")
+	// Round-271 (CONST-046 follow-up): the compressor surfaces an i18n key
+	// `conversation_summarize_llm_failed` rather than the legacy English
+	// string. NoopTranslator returns the key verbatim so it appears in the
+	// error.
+	assert.Contains(t, err.Error(), "conversation_summarize_llm_failed")
 	assert.Equal(t, "", summary)
 	assert.Equal(t, 0, tokens)
 }
@@ -501,7 +505,11 @@ func TestContextCompressor_SummarizeConversation_LLMError(t *testing.T) {
 	messages := makeMessages(5, "Message content", 10)
 	summary, tokens, err := cc.summarizeConversation(context.Background(), messages, nil)
 	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "LLM summarization failed")
+	// Round-271 (CONST-046 follow-up): the compressor surfaces an i18n key
+	// `conversation_summarize_llm_failed` rather than the legacy English
+	// string. NoopTranslator returns the key verbatim so it appears in the
+	// error.
+	assert.Contains(t, err.Error(), "conversation_summarize_llm_failed")
 	assert.Equal(t, "", summary)
 	assert.Equal(t, 0, tokens)
 }
@@ -623,7 +631,11 @@ func TestContextCompressor_CompressFull_LLMError(t *testing.T) {
 
 	compressed, err := cc.compressFull(context.Background(), messages, entities, config)
 	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "LLM summarization failed")
+	// Round-271 (CONST-046 follow-up): the compressor surfaces an i18n key
+	// `conversation_summarize_llm_failed` rather than the legacy English
+	// string. NoopTranslator returns the key verbatim so it appears in the
+	// error.
+	assert.Contains(t, err.Error(), "conversation_summarize_llm_failed")
 	assert.Nil(t, compressed)
 }
 
