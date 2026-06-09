@@ -21,4 +21,4 @@ require (
 )
 
 // For local development, replaced by root go.mod
-replace digital.vasic.messaging => ../Messaging
+replace digital.vasic.messaging => ../messaging
