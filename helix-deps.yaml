@@ -1,0 +1,9 @@
+# helix-deps.yaml — conversation Submodule-Dependency-Manifest (HelixConstitution §11.4.31)
+# Catalogue-Check (§11.4.74): inspected go.mod; own-org deps: messaging (require digital.vasic.messaging + replace => ../messaging).
+schema_version: 1
+deps:
+  - {name: Messaging, ssh_url: git@github.com:vasic-digital/Messaging.git, ref: main, why: "go.mod requires module digital.vasic.messaging (replaced to ../messaging) for messaging primitives", layout: flat}
+transitive_handling:
+  recursive: true
+  conflict_resolution: operator-required
+language_specific_subtree: false
